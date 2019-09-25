@@ -55,7 +55,7 @@ class Received_Image(object):
         self.resolution = resolution
         self.colorChannels = colorChannels
         # need to initialize the matrix at timestep 0
-        self.ImageBuffer = np.zeros((resolution[1], resolution[0], colorChannels))  # rows, columns, colorchannels
+        self.ImageBuffer = np.zeros((resolution[1], resolution[0], colorChannels))  # rows, columns, colorchann
 
     def update_image(self, received_parts):
         self.received_parts = received_parts
@@ -158,13 +158,13 @@ class Component(ApplicationSession):
             self.end_count = 0
             self.prev_sender = None
             self.sender = None
-            self.touch = [False,False,False,False,False]
+            self.touch = [False, False, False, False,False]
             self.prev_receiver = None
             self.receiver = None
             self.def_idx = 0
             self.atk_idx = 0
             self.closest_order = []
-            self.player_state = [None,None,None,None,None]
+            self.player_state = [None, None, None, None, None]
 
             self.wheels = [0 for _ in range(10)]
             return
@@ -200,8 +200,8 @@ class Component(ApplicationSession):
         # if that happens, the velocity ratio between left and right wheels will be changed that the robot may not execute
         # turning actions correctly.
         if (abs(left_wheel) > self.max_linear_velocity[id] or abs(right_wheel) > self.max_linear_velocity[
-            id] or max_velocity):
-            if (abs(left_wheel) > abs(right_wheel)):
+                id] or max_velocity):
+            if abs(left_wheel) > abs(right_wheel):
                 multiplier = self.max_linear_velocity[id] / abs(left_wheel)
             else:
                 multiplier = self.max_linear_velocity[id] / abs(right_wheel)
@@ -224,41 +224,41 @@ class Component(ApplicationSession):
         # calculate how much the direction is off
         desired_th = (math.pi / 2) if (dx == 0 and dy == 0) else math.atan2(dy, dx)
         d_th = desired_th - self.cur_posture[id][TH]
-        while (d_th > math.pi):
+        while d_th > math.pi:
             d_th -= 2 * math.pi
-        while (d_th < -math.pi):
+        while d_th < -math.pi:
             d_th += 2 * math.pi
 
         # based on how far the target position is, set a parameter that
         # decides how much importance should be put into changing directions
         # farther the target is, less need to change directions fastly
-        if (d_e > 1):
+        if d_e > 1:
             ka = 17 / 90
-        elif (d_e > 0.5):
+        elif d_e > 0.5:
             ka = 19 / 90
-        elif (d_e > 0.3):
+        elif d_e > 0.3:
             ka = 21 / 90
-        elif (d_e > 0.2):
+        elif d_e > 0.2:
             ka = 23 / 90
         else:
             ka = 25 / 90
 
         # if the target position is at rear of the robot, drive backward instead
-        if (d_th > helper.d2r(95)):
+        if d_th > helper.d2r(95):
             d_th -= math.pi
             sign = -1
-        elif (d_th < helper.d2r(-95)):
+        elif d_th < helper.d2r(-95):
             d_th += math.pi
             sign = -1
 
         # if the direction is off by more than 85 degrees,
         # make a turn first instead of start moving toward the target
-        if (abs(d_th) > helper.d2r(85)):
+        if abs(d_th) > helper.d2r(85):
             self.set_wheel_velocity(id, -mult_ang * d_th, mult_ang * d_th, False)
         # otherwise
         else:
             # scale the angular velocity further down if the direction is off by less than 40 degrees
-            if (d_e < 5 and abs(d_th) < helper.d2r(40)):
+            if d_e < 5 and abs(d_th) < helper.d2r(40):
                 ka = 0.1
             ka *= 4
 
@@ -274,9 +274,9 @@ class Component(ApplicationSession):
             # where at least one wheel is operating at maximum velocity
             self.set_wheel_velocity(id,
                                     sign * scale * (mult_lin * (
-                                                1 / (1 + math.exp(-3 * d_e)) - damping) - mult_ang * ka * d_th),
+                                        1 / (1 + math.exp(-3 * d_e)) - damping) - mult_ang * ka * d_th),
                                     sign * scale * (mult_lin * (
-                                                1 / (1 + math.exp(-3 * d_e)) - damping) + mult_ang * ka * d_th),
+                                        1 / (1 + math.exp(-3 * d_e)) - damping) + mult_ang * ka * d_th),
                                     max_velocity)
 
     # copy coordinates from frames to different variables just for convenience
@@ -299,7 +299,7 @@ class Component(ApplicationSession):
 
         for i in [1, 2]:
             measured_dist = helper.dist(self.cur_ball[X], self.cur_posture[i][X], self.cur_ball[Y],
-                                                self.cur_posture[i][Y])
+                                        self.cur_posture[i][Y])
             all_dist.append(measured_dist)
             if (measured_dist < min_dist):
                 min_dist = measured_dist
@@ -315,7 +315,7 @@ class Component(ApplicationSession):
 
         for i in [3, 4]:
             measured_dist = helper.dist(self.cur_ball[X], self.cur_posture[i][X], self.cur_ball[Y],
-                                                self.cur_posture[i][Y])
+                                        self.cur_posture[i][Y])
             all_dist.append(measured_dist)
             if (measured_dist < min_dist):
                 min_dist = measured_dist
