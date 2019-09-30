@@ -438,9 +438,11 @@ class Component(ApplicationSession):
         return False
 
     # select a sender
-    def set_sender(self, _player_list):
+    def set_sender(self, _player_list): #플레이어 리스트를 가져온다. 매개변수로 가져온 것들은 그 구조가 어떻든 다이렉트로 가리킨다고 보면된다.
         distance_list = [] #여기서 활용하기 위해 새롭게 만든 변수. #기초적인 것, 기본적인 것을 항상 베이스로두고 행동한다는 관점을 가지자.
         for sender in _player_list : #sender에 받은 플레이선수를 차례로 넣어준다
+            #이렇게 보면 sender는 결국 player list에 의해 단순히 결정되는 것 뿐인데 특별한게 있나?
+
             predict_ball = self.predict_ball_location(3) #predict_ball_location은 볼에 관련된 특정 X, Y좌표를 리턴한다는 개념으로 설계되었다.
             ball_distance = helper.dist(predict_ball[X], self.cur_posture[sender][X], predict_ball[Y], self.cur_posture[sender][Y])
             #ㅎhelper.dist 함수에 predict_ball이 받은 [X], [Y] 인덱스와, sender의 X,Y 좌표를 보낸다.
@@ -451,9 +453,13 @@ class Component(ApplicationSession):
         # if the distance between ball and sender is less than 1, choose the closest robot as the sender
         if min(distance_list) < 1.0 :
             return distance_list.index(min(distance_list)) + 1
+        #sender를 모든 로봇이라고 단순히 보고, 그 중 가장 가까운 로봇을 샌더로 지정한다.
+        # => 이렇게 보니 리팩토링이 완전한 코드가 아님을 알 수 있다. 샌더를 결정하는 코드에서 sender 변수를 사용했는데, 이는 플레이어 전체를 말하는거지
+        # 샌더 자체를 지정하지 않는다. 그래서 실질적으로 정해지는 sender의 의미를 손실하여 직관성을 훼손한 사실에 이르렀다.
 
         # otherwise, there is no sender
         return None
+        #sender의 리턴은 두 가지로 나뉜다.
 
     # select a receiver
     def set_receiver(self, _player_list): #player_list란 0~4 전 선수를 말하는 것. 그러한 선수들을 받기 위해 틀을 짜내었다.
@@ -498,7 +504,9 @@ class Component(ApplicationSession):
         self.receive_ball()
         self.send_ball()
 
-        self.prev_sender = self.sender
+        self.prev_sender = self.sender #prev_sender에 현재 sender인 self.sender를 집어넣는 이유는, prev_를 가리키기 위한 값이 cur-> self.sender에
+        #있기 때문이다. => 매우 기초적이고 기본적이고 설명도 필요없는 내용이라 볼 수 있는 당연한 내용이지만, 기초적인 걸 표현하고 행동했을 때 새로운 게 탄생하거나,
+        #기존 것의 농도를 더 증진시킨다.
         self.prev_receiver = self.receiver
 
     def send_ball(self) :
@@ -506,8 +514,11 @@ class Component(ApplicationSession):
             return
 
         goal_dist = helper.dist(4.0, self.cur_posture[self.sender][X], 0, self.cur_posture[self.sender][Y])
+        #4.0과 0은 무엇을 지칭하는지는 모르나, 현재 샌더와 거리를 리턴하여 goal_dist에 대입하고 있다.
+        #두 점 사이의 거리를 알게되면 거리별로 특정 행동을 정의할 수 있겠지. => 내가 보는 활용관점
+
         # if the sender has a shoot chance, it tries to shoot
-        if self.shoot_chance(self.sender) :
+        if self.shoot_chance(self.sender) : #sender 속성을 슛 찬스에 보내고 트루 펄스를 판단 => sender는 공을 차고 있는 플레이어인가? 
             if goal_dist > 0.3 * self.field[X] / 2:
                 self.actions(self.sender, 'dribble',refine=True)
                 return
@@ -546,7 +557,8 @@ class Component(ApplicationSession):
 
     def receive_ball(self) :
         # if receiver does not exist, do nothing
-        if self.receiver == None :
+        if self.receiver == None : #리시버가 없다는 것은, 리시버로 결정될 만한 플레이어가 아무도 없다는 뜻이다. 그렇게 됬을 경우
+            # 함수를 실행한다는 것은 자원낭비를 뜻하므로, return으로 되돌리게 된다.
             return
 
         goal_dist = helper.dist(4.0, self.cur_posture[self.receiver][X], 0, self.cur_posture[self.receiver][Y])
@@ -867,74 +879,85 @@ class Component(ApplicationSession):
         # a basic forward rulebased algorithm
         def forward(self, id):
 
-            return
-            # # if the robot is blocking the ball's path toward opponent side
-            # if (self.cur_ball[X] > -0.3 * self.field[X] / 2 and self.cur_ball[X] < 0.3 * self.field[X] / 2 and
-            #         self.cur_posture[id][X] > self.cur_ball[X] + 0.1 and abs(
-            #                 self.cur_posture[id][Y] - self.cur_ball[Y]) < 0.3):
-            #     if (self.cur_ball[Y] < 0):
-            #         self.set_target_position(id, self.cur_posture[id][X] - 0.25, self.cur_ball[Y] + 0.75, 1.4, 3.0, 0.8, False)
-            #     else:
-            #         self.set_target_position(id, self.cur_posture[id][X] - 0.25, self.cur_ball[Y] - 0.75, 1.4, 3.0, 0.8, False)
-            #     return
+            
+            # if the robot is blocking the ball's path toward opponent side
+            if (self.cur_ball[X] > -0.3 * self.field[X] / 2 and self.cur_ball[X] < 0.3 * self.field[X] / 2 and
+                    self.cur_posture[id][X] > self.cur_ball[X] + 0.1 and abs(
+                            self.cur_posture[id][Y] - self.cur_ball[Y]) < 0.3):
+                #1. soccer filed를 반으로 나누어야 중간 지점에서 계산처리를 할 수 있다. => 일반적으로 필드를 활용하여 뭔가를 계산할 때는 양 끝보다
+                #중앙좌표가 포커싱되기 마련이다.
+                #2. 중간을 나누어 -0.3을 곱했다는 것은 왼쪽 공간의 30% 영역을 가지고 계산하는 것을 의미. 뒤에 and는 오른쪽 30%
+                #필드의 x와 y에 음수값은 존재하지 않지만, 볼과 플레이어는 x와 y를 기준으로 움직인다. 볼과 플레이어의 x, y는 음수 양수로 절반을 활용하기 때문에
+                #각기 절대값으로 변경 후 합해야만 필드 x와 y의 값과 동일선상에 위치해있다고 말할 수 있다. (동일하지 않다고 표현하는 것은 표현 단위가 다르기 때문에
+                #동일한 양으로 칠 수 없기 때문이다.)
+                #그 뒤의 and는 볼의 위치보다 앞섬을 의미. (red 기준) 그 뒤의 abs는 0아니면 무조건 1같은 자연수값이 나오는게 아닌가?
+                #자연수라는 표현은 그 자체가 애매하므로 배제시켜 활용한다. => 내 기준에서 자연수가 의미를 가지려면 1부터 시작해야함. 고로 다시 쓴다.
+        
+    
+                if (self.cur_ball[Y] < 0): #공이 아래에 가있다면,
+                    self.set_target_position(id, self.cur_posture[id][X] - 0.25, self.cur_ball[Y] + 0.75, 1.4, 3.0, 0.8, False)
+                    
+                else:
+                    self.set_target_position(id, self.cur_posture[id][X] - 0.25, self.cur_ball[Y] - 0.75, 1.4, 3.0, 0.8, False)
+                return
 
-            # # if the robot can shoot from current position
-            # if (id == self.atk_idx and self.shoot_chance(id)):
-            #     pred_ball = self.predict_ball_location(2)
-            #     self.set_target_position(id, pred_ball[X], pred_ball[Y], 1.4, 5.0, 0.4, True)
-            #     return
+            # if the robot can shoot from current position
+            if (id == self.atk_idx and self.shoot_chance(id)):
+                pred_ball = self.predict_ball_location(2)
+                self.set_target_position(id, pred_ball[X], pred_ball[Y], 1.4, 5.0, 0.4, True)
+                return
 
-            # # if the ball is coming toward the robot, seek for shoot chance
-            # if (id == self.atk_idx and self.ball_coming_toward_robot(id)):
-            #     dx = self.cur_ball[X] - self.prev_ball[X]
-            #     dy = self.cur_ball[Y] - self.prev_ball[Y]
-            #     pred_x = (self.cur_posture[id][Y] - self.cur_ball[Y]) * dx / dy + self.cur_ball[X]
-            #     steps = (self.cur_posture[id][Y] - self.cur_ball[Y]) / dy
+            # if the ball is coming toward the robot, seek for shoot chance
+            if (id == self.atk_idx and self.ball_coming_toward_robot(id)):
+                dx = self.cur_ball[X] - self.prev_ball[X]
+                dy = self.cur_ball[Y] - self.prev_ball[Y]
+                pred_x = (self.cur_posture[id][Y] - self.cur_ball[Y]) * dx / dy + self.cur_ball[X]
+                steps = (self.cur_posture[id][Y] - self.cur_ball[Y]) / dy
 
-            #     # if the ball will be located in front of the robot
-            #     if (pred_x > self.cur_posture[id][X]):
-            #         pred_dist = pred_x - self.cur_posture[id][X]
-            #         # if the predicted ball location is close enough
-            #         if (pred_dist > 0.1 and pred_dist < 0.3 and steps < 10):
-            #             # find the direction towards the opponent goal and look toward it
-            #             goal_angle = self.direction_angle(id, self.field[X] / 2, 0)
-            #             self.angle(id, goal_angle)
-            #             return
+                # if the ball will be located in front of the robot
+                if (pred_x > self.cur_posture[id][X]):
+                    pred_dist = pred_x - self.cur_posture[id][X]
+                    # if the predicted ball location is close enough
+                    if (pred_dist > 0.1 and pred_dist < 0.3 and steps < 10):
+                        # find the direction towards the opponent goal and look toward it
+                        goal_angle = self.direction_angle(id, self.field[X] / 2, 0)
+                        self.angle(id, goal_angle)
+                        return
 
-            # # if this forward is closer to the ball than the other forward
-            # if (id == self.atk_idx):
-            #     if (self.cur_ball[X] > -0.3 * self.field[X] / 2):
-            #         # if the robot can push the ball toward opponent's side, do it
-            #         if (self.cur_posture[id][X] < self.cur_ball[X] - self.ball_radius):
-            #             self.set_target_position(id, self.cur_ball[X], self.cur_ball[Y], 1.4, 5.0, 0.4, True)
-            #         else:
-            #             # otherwise go behind the ball
-            #             if (abs(self.cur_ball[Y] - self.cur_posture[id][Y]) > 0.3):
-            #                 self.set_target_position(id, self.cur_ball[X] - 0.2, self.cur_ball[Y], 1.4, 3.5, 0.6, False)
-            #             else:
-            #                 self.set_target_position(id, self.cur_ball[X] - 0.2, self.cur_posture[id][Y], 1.4, 3.5, 0.6, False)
-            #     else:
-            #         self.set_target_position(id, -0.1 * self.field[X] / 2, self.cur_ball[Y], 1.4, 3.5, 0.4, False)
-            # # if this forward is not closer to the ball than the other forward
-            # else:
-            #     if (self.cur_ball[X] > -0.3 * self.field[X] / 2):
-            #         # ball is on our right
-            #         if (self.cur_ball[Y] < 0):
-            #             self.set_target_position(id, self.cur_ball[X] - 0.25, self.goal[Y] / 2, 1.4, 3.5, 0.4, False)
-            #         # ball is on our left
-            #         else:
-            #             self.set_target_position(id, self.cur_ball[X] - 0.25, -self.goal[Y] / 2, 1.4, 3.5, 0.4, False)
-            #     else:
-            #         # ball is on right side
-            #         if (self.cur_ball[Y] < 0):
-            #             self.set_target_position(id, -0.1 * self.field[X] / 2,
-            #                           min(-self.cur_ball[Y] - 0.5, self.field[Y] / 2 - self.robot_size[id] / 2), 1.4,
-            #                           3.5, 0.4, False)
-            #         # ball is on left side
-            #         else:
-            #             self.set_target_position(id, -0.1 * self.field[X] / 2,
-            #                           max(-self.cur_ball[Y] + 0.5, -self.field[Y] / 2 + self.robot_size[id] / 2), 1.4,
-            #                           3.5, 0.4, False)
+            # if this forward is closer to the ball than the other forward
+            if (id == self.atk_idx):
+                if (self.cur_ball[X] > -0.3 * self.field[X] / 2):
+                    # if the robot can push the ball toward opponent's side, do it
+                    if (self.cur_posture[id][X] < self.cur_ball[X] - self.ball_radius):
+                        self.set_target_position(id, self.cur_ball[X], self.cur_ball[Y], 1.4, 5.0, 0.4, True)
+                    else:
+                        # otherwise go behind the ball
+                        if (abs(self.cur_ball[Y] - self.cur_posture[id][Y]) > 0.3):
+                            self.set_target_position(id, self.cur_ball[X] - 0.2, self.cur_ball[Y], 1.4, 3.5, 0.6, False)
+                        else:
+                            self.set_target_position(id, self.cur_ball[X] - 0.2, self.cur_posture[id][Y], 1.4, 3.5, 0.6, False)
+                else:
+                    self.set_target_position(id, -0.1 * self.field[X] / 2, self.cur_ball[Y], 1.4, 3.5, 0.4, False)
+            # if this forward is not closer to the ball than the other forward
+            else:
+                if (self.cur_ball[X] > -0.3 * self.field[X] / 2):
+                    # ball is on our right
+                    if (self.cur_ball[Y] < 0):
+                        self.set_target_position(id, self.cur_ball[X] - 0.25, self.goal[Y] / 2, 1.4, 3.5, 0.4, False)
+                    # ball is on our left
+                    else:
+                        self.set_target_position(id, self.cur_ball[X] - 0.25, -self.goal[Y] / 2, 1.4, 3.5, 0.4, False)
+                else:
+                    # ball is on right side
+                    if (self.cur_ball[Y] < 0):
+                        self.set_target_position(id, -0.1 * self.field[X] / 2,
+                                      min(-self.cur_ball[Y] - 0.5, self.field[Y] / 2 - self.robot_size[id] / 2), 1.4,
+                                      3.5, 0.4, False)
+                    # ball is on left side
+                    else:
+                        self.set_target_position(id, -0.1 * self.field[X] / 2,
+                                      max(-self.cur_ball[Y] + 0.5, -self.field[Y] / 2 + self.robot_size[id] / 2), 1.4,
+                                      3.5, 0.4, False)
 
         def default_rulebased(self, player_list):
             for p in player_list:
