@@ -740,18 +740,6 @@ class Component(ApplicationSession):
 
         # a basic goalkeeper rulbased algorithm
         def goalkeeper(self, id):
-<<<<<<< HEAD
-            x = 2
-        
-        def defender(self, id):
-            x = 2
-
-        def forward(self, id):
-            x = 2
-
-        def default_rulebased(self, player_list):            
-            x = 3
-=======
 
             self.set_target_position(0, 0, 0, 1.4, 3.0, 0.4, False)
             self.set_target_position(1, 0, 0, 1.4, 3.0, 0.4, False)
@@ -965,7 +953,6 @@ class Component(ApplicationSession):
                 if p == 3 or p == 4:
                     forward(self, p)
                     continue
->>>>>>> e076de4... 1hour result
 
         def passing_play(self, player_list):
             def find_active_player(self, ids):
