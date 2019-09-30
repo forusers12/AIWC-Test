@@ -15,7 +15,6 @@ from autobahn.twisted.wamp import ApplicationSession, ApplicationRunner
 import argparse
 import random
 import sys
-
 import base64
 import numpy as np
 
@@ -75,8 +74,8 @@ class SubImage(object):
         self.height = height
         self.b64 = b64
 
-class Frame(object):
-    def __init__(self):
+class Frame(object): #객체를 매개변수로 받고, 
+    def __init__(self): 
         self.time = None
         self.score = None
         self.reset_reason = None
@@ -138,6 +137,7 @@ class Component(ApplicationSession):
             self.end_of_frame = False
             self.received_frame = Frame()
             self.image = Received_Image(self.resolution, self.colorChannels)
+            
             return
 ##############################################################################
 
@@ -170,7 +170,7 @@ class Component(ApplicationSession):
 
         # initiate empty frame
         if (self.end_of_frame):
-            self.received_frame = Frame()
+            self.received_frame = Frame() #해당 구조를 received_frame에 적용시키고
             self.end_of_frame = False
         received_subimages = []
 
@@ -204,8 +204,16 @@ class Component(ApplicationSession):
             #self.printConsole(self.received_frame.half_passed)
             #self.printConsole(self.end_of_frame)
 
+        
+
+        
+
+
         if (self.end_of_frame):
             #self.printConsole("end of frame")
+
+
+
 
             if (self.received_frame.reset_reason == GAME_START):
                 if (not self.received_frame.half_passed):
