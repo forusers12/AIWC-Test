@@ -649,6 +649,23 @@ class Component(ApplicationSession):
 
             ##############################################################################
             if (self.received_frame.game_state == STATE_DEFAULT):
+                pass
+
+                # Foul 1
+
+                # Foul 2
+                # if(self.received_frame.time > 2):
+                #     self.set_target_position(1, 3.5, 0.7, 1.4, 10.0, 0.4, False)
+                #     self.set_target_position(2, 3.5, -0.7, 1.4, 10.0, 0.4, False)
+
+                # if(self.received_frame.time > 2.2):
+                #     self.set_target_position(3, 3.5, 0.7, 1.4, 10.0, 0.4, False)
+
+                # Foul 3
+
+                # Rule 1 => 플레이어가 넘어졌을 때
+                self.set_target_position(1, 1, 3, 1.4, 10.0, 0.4, False)
+
                 # robot functions in STATE_DEFAULT
                 #goalkeeper(self, 0)
                 #defender(self, 1)
@@ -661,7 +678,16 @@ class Component(ApplicationSession):
             elif (self.received_frame.game_state == STATE_KICKOFF):
                 #  if the ball belongs to my team, initiate kickoff
                 if (self.received_frame.ball_ownership):
-                    pass #self.set_target_position(4, 0, 0, 1.4, 3.0, 0.4, False)
+                    pass
+
+                # Foul 1
+                # self.set_target_position(4, 0, 0, 1.4, 3.0, 0.4, False)
+                
+                # Foul 2
+
+                # Foul 3
+
+                # Rule 1
 
                 set_wheel(self, self.wheels)
             ##############################################################################

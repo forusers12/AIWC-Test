@@ -50,6 +50,9 @@ ACTIVE = 3
 TOUCH = 4
 # => 리스트를 딕셔너리처럼 사용할 수 있게 만드는 변수들
 
+# TestCase
+TestCase = 1
+
 class Received_Image(object):
     def __init__(self, resolution, colorChannels):
         self.resolution = resolution
@@ -625,6 +628,28 @@ class Component(ApplicationSession):
         if self.player_state[id] == 'stop' :
             mode = 'stop'
 
+        if mode == 'test' : 
+            # kick the ball
+            if target_pts == None :
+                target_pts = self.cur_ball #set_target_position 좌표를 위환 포지션
+            if params == None :
+                params = [1.4, 5.0, 0.8, True] # scale, mult_lin, mult_ang, max_velocity 를 정하는 요소
+                #실제 게임에서 어느정도의 효과가 있는지는 모르겠다. 이 수치들이 어느정도의 영향을 미치는지, 어떤 그림을 그려내는지에 대한
+            if self.end_count == 0 and not self.touch[id] :
+                self.end_count = self.cur_count + 10 # 0.05 * cnt seconds
+
+            #player_state[id]에 각 플레이어의 상태를 지칭하는 속성을 담음.
+            self.player_state[id] = 'kick'
+            if self.touch[id] :
+                self.player_state[id] = 'stop'
+            if not self.touch[id] :
+                self.touch[id] = self.cur_posture[id][TOUCH]
+            if self.player_state[id] == 'stop' :
+                params = [0.0, 0.0, 0.0, False]
+            self.set_target_position(id, target_pts[X], target_pts[Y], params[0], params[1], params[2], params[3])
+            #target_pts에 현재 볼 위치를 담아서 보내는 것.
+            return
+
         if mode == None :
             # reset all robot status
             if self.sender == id : #현재 샌더가 이 함수를 호출한 매개변수 값과 동일하다면,
@@ -753,8 +778,8 @@ class Component(ApplicationSession):
         return predict_pass_point
 
     @inlineCallbacks
-    def on_event(self, f):
-
+    def on_event(self, f): #어느 변수든 on_event에 f를 넘겨주네, f를 넘겨준다고 해당 변수의 이름이 f는 아니니까, on_event를 찾아봐야 알 수 있다.
+#on_event(로 검색이 안된다는 것은, 다른 언어에서 이 함수를 호출하는 틀이 다르다는 것을 알 수 있다. => 그렇다면 on_event 자체로 검색
         @inlineCallbacks
         def set_wheel(self, robot_wheels):
             yield self.call(u'aiwc.set_speed', args.key, robot_wheels)
@@ -1054,7 +1079,7 @@ class Component(ApplicationSession):
             self.image.update_image(received_subimages)
         if 'coordinates' in f:
             self.received_frame.coordinates = f['coordinates']
-        if 'EOF' in f:
+        if 'EOF' in f: #f안에 EOF가 들어있다면, (안정성을 위해 이 작업을 해주는듯. 굳이 안해줘도 작동은 잘 할 것이다.)
             self.end_of_frame = f['EOF']
 
         if (self.end_of_frame):
@@ -1089,20 +1114,51 @@ class Component(ApplicationSession):
 
             ##############################################################################
             if (self.received_frame.game_state == STATE_DEFAULT):
+                pass
+                # Foul 1 => 상대방에게 패널티킥 줌.
+                # self.set_target_position(1, -3.5, 0, 1.4, 3.0, 0.4, False)
+                # self.set_target_position(2, -3.5, 0, 1.4, 3.0, 0.4, False)
+                # self.set_target_position(3, -3.5, 0, 1.4, 3.0, 0.4, False)
+
+                # Foul 2 => 자기팀 중 한 명이 '랜덤 중앙 재배치'
+                # self.set_target_position(1, -3, 3, 1.4, 10.0, 0.4, False)
+                # self.set_target_position(2, -2, -3, 1.4, 10.0, 0.4, False)
+                # self.set_target_position(3, -2, 3, 1.4, 10.0, 0.4, False)
+                # self.set_target_position(4, 0, 3, 1.4, 10.0, 0.4, False)
+
+                # Foul 3 => 키퍼 벗어났을 때
+                # self.set_target_position(0, 3, 3, 1.4, 3.0, 0.4, False)
+
+                # Rule 1 => 플레이어가 넘어졌을 때
+                self.set_target_position(2, 1, 3, 1.4, 10.0, 0.4, False)
+
+
                 # robot functions in STATE_DEFAULT
                 # goalkeeper simply executes goalkeeper algorithm on its own
-                # goalkeeper(self, 0)
-
+                # goalkeeper(self, 0)                
                 # defenders and forwards can pass ball to each other if necessary
                 # passing_play(self, [1, 2, 3, 4])
                 # => 패싱플레이가 1 -> 2 -> 3 -> 4로 이어지는건가?
                 set_wheel(self, self.wheels)
             ##############################################################################
             elif (self.received_frame.game_state == STATE_KICKOFF): #off라는 말과는 반대로 시작하다, 켜다라는 의미를 가진 KICK OFF
-                #  if the ball belongs to my team, initiate kickoff
-                if (self.received_frame.ball_ownership):                    
-                    pass #self.set_target_position(4, 0, 0, 1.4, 3.0, 0.4, False)
+                
 
+                #  if the ball belongs to my team, initiate kickoff
+                if (self.received_frame.ball_ownership):                   
+                    pass
+                    # Foul 1 
+                    # self.set_target_position(4, 0, 0, 1.4, 2.3, 0.4, False)
+
+                    # Foul 2 
+                    # self.set_target_position(4, 0, 0, 1.4, 2.0, 0.4, False)
+
+                    # Foul 3 
+                    # self.set_target_position(4, 0, 0, 1.4, 2.0, 0.4, False)
+
+                    # Rule 1 
+                    self.set_target_position(4, 0, 0, 1.4, 2.0, 0.4, False)
+                    
                 set_wheel(self, self.wheels)
             ##############################################################################
             elif (self.received_frame.game_state == STATE_GOALKICK):

@@ -1472,7 +1472,7 @@ void game::run_game()
         }
       }
 
-      if(reset_reason == c::NONE && deadlock_flag_ == true) {
+      if(reset_reason == c::NONE && deadlock_flag_ == true) {        
         if(sv_.get_ball_velocity() >= c::DEADLOCK_THRESHOLD) {
           deadlock_time_ = time_ms_;
         }
@@ -1604,6 +1604,7 @@ void game::run_game()
           }
           // if the deadlock happened in the general region, relocate the ball and continue the game
           else {
+            
             pause();
             stop_robots();
             step(c::WAIT_STABLE_MS);

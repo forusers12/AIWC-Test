@@ -8,5 +8,5 @@ selectionDisabled: 0
 viewpointLocked: 0
 orthographicViewHeight: 1
 textFiles: 0 "protos/soccerrobot/SoccerRobot.proto"
-renderingDevicePerspectives: referee:cam_b;0;0.451562;0;0
 renderingDevicePerspectives: referee:cam_a;0;0.451562;0;0
+renderingDevicePerspectives: referee:cam_b;0;0.451562;0;0
