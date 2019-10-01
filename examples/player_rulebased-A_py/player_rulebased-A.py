@@ -1115,22 +1115,48 @@ class Component(ApplicationSession):
             ##############################################################################
             if (self.received_frame.game_state == STATE_DEFAULT):
                 pass
-                # Foul 1 => 상대방에게 패널티킥 줌.
-                # self.set_target_position(1, -3.5, 0, 1.4, 3.0, 0.4, False)
-                # self.set_target_position(2, -3.5, 0, 1.4, 3.0, 0.4, False)
-                # self.set_target_position(3, -3.5, 0, 1.4, 3.0, 0.4, False)
+            # Foul 1 => 상대방에게 패널티킥 줌.
+                self.set_target_position(1, -3.5, 0, 1.4, 3.0, 0.4, False)
+                self.set_target_position(2, -3.5, 0, 1.4, 3.0, 0.4, False)
+                self.set_target_position(3, -3.5, 0, 1.4, 3.0, 0.4, False)
 
-                # Foul 2 => 자기팀 중 한 명이 '랜덤 중앙 재배치'
+            # Foul 2 => 공이 패널티 라인안에, 적 로봇이 패널티 라인에 2마리 이상 -> 아군 골킥부여
                 # self.set_target_position(1, -3, 3, 1.4, 10.0, 0.4, False)
                 # self.set_target_position(2, -2, -3, 1.4, 10.0, 0.4, False)
                 # self.set_target_position(3, -2, 3, 1.4, 10.0, 0.4, False)
                 # self.set_target_position(4, 0, 3, 1.4, 10.0, 0.4, False)
 
-                # Foul 3 => 키퍼 벗어났을 때
+            # Foul 3 => 공격수가 적 패널티 안에 1초 이상 들어가면 랜덤 재배치
+                # self.set_target_position(1, -3, 3, 1.4, 10.0, 0.4, False)
+                # self.set_target_position(2, -2, -3, 1.4, 10.0, 0.4, False)
+                # self.set_target_position(3, -2, 3, 1.4, 10.0, 0.4, False)
+                
+
+            # Foul 4 => 키퍼 벗어났을 때
                 # self.set_target_position(0, 3, 3, 1.4, 3.0, 0.4, False)
 
-                # Rule 1 => 플레이어가 넘어졌을 때
-                self.set_target_position(2, 1, 3, 1.4, 10.0, 0.4, False)
+            # Rule 1 => 공이 나갔을 때
+
+                # self.set_target_position(3, -1, 3, 1.4, 4.0, 0.0, False)
+
+                # if(self.received_frame.time > 3 and self.received_frame.time < 3.2):
+                #     self.set_wheel_velocity(4, 0.0, 0.1, False) #해당각도로 위치를 잡겠다.
+                    
+                # elif(self.received_frame.time == 3.3):    
+                #     self.set_wheel_velocity(4, 0.0, 0, False)
+
+                # elif(self.received_frame.time >= 3.3 and self.received_frame.time <= 4.3):        
+                #     self.set_target_position(4, 0, 0, 1.4, 4.0, 0.0, False) #앵글값은 그 각도로 해당포지션을 가겠다는 의미.
+                    #앵글 값을 주지않으면, 이동시에 앞 뒤로만 움직이게 된다. 즉, 이동 시 각도를 정해주는 역할.
+                # elif(self.received_frame.time >= 5.0 and self.received_frame.time <= 10.0):        
+                #     self.set_target_position(4, self.cur_ball[X], self.cur_ball[Y], 1.4, 4.0, 0.0, False)
+
+                    
+
+                # self.set_target_position(2, 0, -1, 1.4, 10.0, 0.4, False)
+
+            # Rule 2 => 플레이어가 넘어졌을 때
+                # self.set_target_position(2, 0, -1, 1.4, 10.0, 0.4, False)
 
 
                 # robot functions in STATE_DEFAULT
@@ -1143,21 +1169,33 @@ class Component(ApplicationSession):
             ##############################################################################
             elif (self.received_frame.game_state == STATE_KICKOFF): #off라는 말과는 반대로 시작하다, 켜다라는 의미를 가진 KICK OFF
                 
+                # def set_target_position(self, id, x, y, scale, mult_lin, mult_ang, max_velocity):                
+                # def set_wheel_velocity(self, id, left_wheel, right_wheel, max_velocity):
 
                 #  if the ball belongs to my team, initiate kickoff
                 if (self.received_frame.ball_ownership):                   
                     pass
-                    # Foul 1 
-                    # self.set_target_position(4, 0, 0, 1.4, 2.3, 0.4, False)
+                # Foul 1 
+                    self.set_target_position(4, 0, 0, 1.4, 2.3, 0.4, False)
 
-                    # Foul 2 
+                # Foul 2 
                     # self.set_target_position(4, 0, 0, 1.4, 2.0, 0.4, False)
+                                        
+                # Foul 3                     
+                    # if(self.received_frame.time > 0 and self.received_frame.time < 0.2):
+                    #     self.set_wheel_velocity(4, 0.0, 0.7, False)
+                        
+                    # elif(self.received_frame.time == 0.3):    
+                    #     self.set_wheel_velocity(4, 0.0, 0, False)
 
-                    # Foul 3 
+                    # elif(self.received_frame.time > 0.3):        
+                    #     self.set_target_position(4, -0.2, 0, 1.4, 4.0, 0.0, False)                                    
+
+                # Rule 1
+                    # self.set_target_position(4, 0, 0, 1.4, 2.0, 0.4, False)                    
+
+                # Rule 2 
                     # self.set_target_position(4, 0, 0, 1.4, 2.0, 0.4, False)
-
-                    # Rule 1 
-                    self.set_target_position(4, 0, 0, 1.4, 2.0, 0.4, False)
                     
                 set_wheel(self, self.wheels)
             ##############################################################################
