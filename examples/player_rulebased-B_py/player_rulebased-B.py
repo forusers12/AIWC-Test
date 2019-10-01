@@ -650,18 +650,18 @@ class Component(ApplicationSession):
             ##############################################################################
             if (self.received_frame.game_state == STATE_DEFAULT):
                 # robot functions in STATE_DEFAULT
-                goalkeeper(self, 0)
-                defender(self, 1)
-                defender(self, 2)
-                forward(self, 3)
-                forward(self, 4)
+                #goalkeeper(self, 0)
+                #defender(self, 1)
+                #defender(self, 2)
+                #forward(self, 3)
+                #forward(self, 4)
 
                 set_wheel(self, self.wheels)
             ##############################################################################
             elif (self.received_frame.game_state == STATE_KICKOFF):
                 #  if the ball belongs to my team, initiate kickoff
                 if (self.received_frame.ball_ownership):
-                    self.set_target_position(4, 0, 0, 1.4, 3.0, 0.4, False)
+                    pass #self.set_target_position(4, 0, 0, 1.4, 3.0, 0.4, False)
 
                 set_wheel(self, self.wheels)
             ##############################################################################
