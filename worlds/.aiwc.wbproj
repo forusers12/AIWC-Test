@@ -8,5 +8,5 @@ selectionDisabled: 0
 viewpointLocked: 0
 orthographicViewHeight: 1
 textFiles: 0 "worlds/aiwcView.wbt"
-renderingDevicePerspectives: referee:cam_b;0;1;0;0
 renderingDevicePerspectives: referee:cam_a;0;1;0;0
+renderingDevicePerspectives: referee:cam_b;0;1;0;0
