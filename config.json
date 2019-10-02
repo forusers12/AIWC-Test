@@ -1,16 +1,16 @@
 {
   "rule": {
     "game_time": 300,
-    "deadlock": false
+    "deadlock": true
   },
   "team_a": {
     "name": "teamA",
-    "executable": "examples/player_rulebased-A_py/fall1_A.py",
+    "executable": "examples/player_rulebased-A_py/ballout1_A.py",
     "datapath": "examples/team_a_data"
   },
   "team_b": {
     "name": "teamB",
-    "executable": "examples/player_rulebased-B_py/fall1_B.py",
+    "executable": "examples/player_rulebased-B_py/ballout1_B.py",
     "datapath": "examples/team_b_data"
   },
   "commentator": {

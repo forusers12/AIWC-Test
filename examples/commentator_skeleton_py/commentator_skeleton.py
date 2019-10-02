@@ -205,8 +205,8 @@ class Component(ApplicationSession):
             #self.printConsole(self.end_of_frame)
 
         
-
         
+
 
 
         if (self.end_of_frame):
